@@ -137,16 +137,21 @@ predictedY=clf.predict(one_row_X)
     #print X_train
     #for X in X_train:
 returnData=[]
+
 for x in predictedY:
             #print X
     if x[0]==1:
-        print x,'  good'
+        #print x,'  good'
         returnData.append({"ISBAD":"good"})
     else:
-        print x,'  bad'
+        #print x,'  bad'
         returnData.append({"ISBAD": "bad"})
 #print(clf.feature_importances_)
 #print clf.predict_proba(one_row_X)
+i = 0
 for value in clf.predict_proba(one_row_X)[1]:
-    returnData[i].rate({"rate": value[0]})
-    print value[0]
+    returnData[i]["rate"] = value[0]
+    i=i+1
+    #print value[0]
+
+print returnData
