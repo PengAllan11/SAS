@@ -8,6 +8,7 @@ from sklearn import preprocessing
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.externals.six import StringIO
 from sklearn import tree
+from flask import request
 
 app = Flask(__name__)
 
@@ -18,9 +19,11 @@ def hello_world():
 
 @app.route('/SAS')
 def index():
-    db = MySQLdb.connect("10.60.38.159", "admin", "1234", "SAS")
+    num = request.args.get('num')
+    print num
+    db = MySQLdb.connect("10.60.38.159", "admin", "1234", "SAS",)
     cursor = db.cursor()
-    sql = "select * from property_data limit 1000"
+    sql = "select * from property_data limit 10000"
     try:
         cursor.execute(sql)
         results = cursor.fetchall()
@@ -67,7 +70,7 @@ def index():
         print "Error:unable to fecth TEST data."
 
     # peng an adds
-    print results
+    # print results
     # 将数据转化成DataFrame形式
     test_data = pd.DataFrame([[j for j in i] for i in results])
     # 属性值命名
@@ -98,7 +101,28 @@ def index():
         f = tree.export_graphviz(clf, out_file=f, feature_names=names)
     score = clf.score(test_X, test_Y)
     print score
-    return str(score)
+
+    # num = int(input('Please enter what you want to predict(enter a number): '))
+    num = int(num)
+    # print X_train[num,:]
+    one_row_X = dummy_X[num:num +1, :]
+    print ('one_row_X:' + str(one_row_X))
+    predictedY = clf.predict(one_row_X)
+    # print predictedY
+    # predicted=[]
+    # print X_train
+    # for X in X_train:
+    returnout = ''
+    for x in predictedY:
+        # print X
+        if x[0] == 1:
+            print x, '  good'
+            returnout = '准确率：' + str(score) + '\n第' + str(num) + '个人：' +"good"
+        else:
+            print x, '  bad'
+            returnout = '准确率：' + str(score) + '\n第' + str(num) + '个人：' +"bad"
+
+    return returnout
 
 if __name__ == '__main__':
     app.run()
